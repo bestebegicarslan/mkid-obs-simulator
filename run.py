@@ -1,11 +1,4 @@
 
-"""
-Created on Wed Jul 15 09:11:53 2015
-This program is designed to simulate the sensitivity of KID camera to many
-sources
-@author: cafolla
-"""
-
 from __future__ import division
 import os
 import sys
@@ -25,9 +18,11 @@ sys.path.append(path)
 import reader
 from select_parameters import select_parameters
 from generatespectra import generatorspectra
+from tablespectra import tablespectral
 from skyflux import sky
 from loadfilter import *
 from contourplot import contourplot
+import glob
 
 # ask the user the parameter file to use
 filename = select_parameters()
@@ -40,7 +35,15 @@ filtername, spectraltype, mV,  startrange, endrange, arrsize, skyfile,\
 
 # generate sky values and spectra
 skyvalues = sky(filename)
-spectra = generatorspectra(spectraltype,mV, filename)
+if spectraltype < 0.0:
+    library=(glob.glob('/home/software/mkid-obs-simulator/library_mkid/*'))
+    print(library)
+    template_sp = raw_input('Please select your template spectrum:')
+
+    
+    spectra = tablespectral(spectraltype, mV, filename, template_sp)
+else:
+    spectra = generatorspectra(spectraltype,mV, filename)
 
 # print the graph!
 print(contourplot(spectra,skyvalues, filename))
